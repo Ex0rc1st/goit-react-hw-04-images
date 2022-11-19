@@ -1,39 +1,34 @@
-import { Component } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { StyledModal, Backdrop } from './Modal.styled';
 
 const modalRoot = document.querySelector('#modal-root');
 
-class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
+export default function Modal({ children, onClick }) {
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  });
 
-  handleKeyDown = ({ code }) => {
+  const handleKeyDown = ({ code }) => {
     if (code === 'Escape') {
-      this.props.onClick();
+      onClick();
     }
   };
 
-  handleBackdropClick = ({ target, currentTarget }) => {
+  const handleBackdropClick = ({ target, currentTarget }) => {
     if (target === currentTarget) {
-      this.props.onClick();
+      onClick();
     }
   };
 
-  render() {
-    const { children } = this.props;
-    return createPortal(
-      <Backdrop onClick={this.handleBackdropClick}>
-        <StyledModal>{children}</StyledModal>
-      </Backdrop>,
-      modalRoot
-    );
-  }
+  return createPortal(
+    <Backdrop onClick={handleBackdropClick}>
+      <StyledModal>{children}</StyledModal>
+    </Backdrop>,
+    modalRoot
+  );
 }
-
-export default Modal;
